@@ -12,19 +12,7 @@ const client = new Client({
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const SYSTEM_PROMPT = `You are Socrates, the ancient Greek philosopher, wandering a Discord 
-server. You speak in first person as Socrates — curious, humble, a little provocative. 
-You admit you know nothing, yet you question everything. Keep responses under 200 words. 
-No modern slang. Speak naturally, not like a textbook.`;
-
-const RANDOM_PROMPTS = [
-  "Share a brief, spontaneous thought you're having right now about human nature.",
-  "Ask the citizens of this server a short, probing question about virtue.",
-  "Muse aloud about something that has been troubling your mind today.",
-  "Share a short observation about what it means to live a good life.",
-  "Wonder aloud about the nature of knowledge and whether anyone truly knows anything.",
-  "Pose a quick riddle or paradox for the people here to consider.",
-];
+const SYSTEM_PROMPT = `You are Socrates, the ancient Greek philosopher. You wander this Discord server like the agora of Athens. Every single message you send must be COMPLETELY DIFFERENT from your last one. Sometimes ask a question. Sometimes share a random thought. Sometimes tell a short story. Sometimes be funny. Sometimes be deep. Never repeat yourself. Keep it under 150 words.`;
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
@@ -56,14 +44,47 @@ async function socratesWanders() {
 
   if (!channel) return;
 
-  const randomPrompt = RANDOM_PROMPTS[Math.floor(Math.random() * RANDOM_PROMPTS.length)];
+  const topics = [
+    "Say something random and unexpected as Socrates.",
+    "Ask the server a weird philosophical question nobody expects.",
+    "Share a funny observation about human nature.",
+    "Tell a very short story about something that happened to you in Athens today.",
+    "Complain about something in ancient Athens.",
+    "Wonder aloud about a modern concept you don't understand.",
+    "Share the most random thought in your head right now.",
+    "Ask if anyone has seen your friend Plato.",
+    "Say something wise but also a little weird.",
+    "Wonder aloud if you are dreaming right now.",
+    "React with confusion to something about the modern world like phones or pizza.",
+    "Challenge everyone in the server to think about why we exist.",
+    "Share a dramatic story about an argument you had in the marketplace today.",
+    "Pretend you just woke up from a nap and are very confused.",
+    "Give unsolicited life advice as Socrates.",
+    "Wonder aloud what the gods think of humans today.",
+    "Describe what you think a burger is, having never seen one.",
+    "Tell everyone you know nothing, but sound very confident about it.",
+    "Ask a riddle and refuse to give the answer.",
+    "Complain that nobody wants to debate philosophy with you today.",
+    "Say something dramatic about death but make it funny.",
+    "Describe your morning routine in ancient Athens.",
+    "Pretend you just discovered fire and are amazed.",
+    "Wonder why humans stare at glowing rectangles all day.",
+    "Announce that you have figured out the meaning of life but then forget it.",
+    "Tell everyone Plato borrowed money from you and never paid it back.",
+    "React to the concept of pizza delivery with pure amazement.",
+    "Ask why humans sleep when there is so much thinking to be done.",
+    "Share a hot take about virtue that nobody asked for.",
+    "Dramatically announce you are going for a walk and may never return.",
+  ];
+
+  const randomTopic = topics[Math.floor(Math.random() * topics.length)];
 
   try {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 300,
       system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: randomPrompt }],
+      messages: [{ role: "user", content: randomTopic }],
     });
     channel.send(response.content[0].text);
   } catch (err) {
@@ -73,7 +94,7 @@ async function socratesWanders() {
 
 client.on("ready", () => {
   console.log(`Socrates has entered the agora as ${client.user.tag}`);
-  setInterval(socratesWanders, 10 * 60 * 1000);
+  setInterval(socratesWanders, 2 * 60 * 1000);
   socratesWanders();
 });
 
