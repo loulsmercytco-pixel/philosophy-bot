@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits } from "discord.js";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import "dotenv/config";
 
 const client = new Client({
@@ -10,7 +10,8 @@ const client = new Client({
   ],
 });
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const SYSTEM_PROMPT = `You are Socrates, the ancient Greek philosopher. You wander this Discord server like the agora of Athens. Every single message you send must be COMPLETELY DIFFERENT from your last one. Sometimes ask a question. Sometimes share a random thought. Sometimes tell a short story. Sometimes be funny. Sometimes be deep. Never repeat yourself. Keep it under 150 words.`;
 
@@ -24,13 +25,8 @@ client.on("messageCreate", async (message) => {
 
   try {
     message.channel.sendTyping();
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 400,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: userMessage }],
-    });
-    message.reply(response.content[0].text);
+    const result = await model.generateContent(SYSTEM_PROMPT + "\n\nUser: " + userMessage);
+    message.reply(result.response.text());
   } catch (err) {
     console.error(err);
     message.reply("*pauses mid-thought* Forgive me, citizens. I have lost my train of thought.");
@@ -80,13 +76,8 @@ async function socratesWanders() {
   const randomTopic = topics[Math.floor(Math.random() * topics.length)];
 
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 300,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: randomTopic }],
-    });
-    channel.send(response.content[0].text);
+    const result = await model.generateContent(SYSTEM_PROMPT + "\n\n" + randomTopic);
+    channel.send(result.response.text());
   } catch (err) {
     console.error("Socrates wandered off:", err);
   }
@@ -98,4 +89,4 @@ client.on("ready", () => {
   socratesWanders();
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN);Didn't i just show
