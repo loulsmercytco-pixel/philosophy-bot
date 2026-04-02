@@ -89,4 +89,4 @@ client.on("ready", () => {
   socratesWanders();
 });
 
-client.login(process.env.DISCORD_TOKEN);Didn't i just show
+client.login(process.env.DISCORD_TOKEN);
